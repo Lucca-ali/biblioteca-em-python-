@@ -1,0 +1,158 @@
+#============================================================
+# ARA0066 – Paradigmas de Linguagens de Programação em Python
+# Trabalho Avaliativo: Sistema de Biblioteca (POO)
+# Professor: Fausto Feitosa
+# Aluno: Lucca araujo ali
+# Matrícula:202402395688
+# Versão do Python:3.13
+# ==========================================
+#classe principal, a classe da qual Livro,Jornal e Revista herdam
+class Publicacao:
+    def __init__(self, titulo, autor, ano_publicacao):
+        self.titulo = titulo
+        self.autor = autor
+        self.ano_publicacao = ano_publicacao #principais atributos
+
+    def exibir_info(self): #metodo para exibir informações
+        print(f"Título: {self.titulo}")
+        print(f"Autor: {self.autor}")
+        print(f"Ano: {self.ano_publicacao}")
+
+class Livro(Publicacao): #subclasse Livro que herda os atributos e metodos,subscreve o exibir_info e adiciona isbn
+    def __init__(self,titulo:str,autor:str,ano_publicacao:int,isbn:str):
+        super().__init__(titulo,autor,ano_publicacao) # herança,usa atributos da classe mãe
+        self.isbn=isbn
+    #subscreve os métodos (polimorfismo)
+    def exibir_info(self):
+        return (
+            f"Título: {self.titulo}\n"
+            f"Autor: {self.autor}\n"
+            f"Ano: {self.ano_publicacao}\n"
+            f"ISBN: {self.isbn}"
+        )
+    #subsclasse Jornal herda os atributos de Publicação e adiciona o atributo emissora
+class Jornal(Publicacao):
+    def __init__(self, titulo, autor, ano, emissora):
+            super().__init__(titulo, autor, ano)
+            self.emissora = emissora
+
+    #subscreve exibir_info(polimorfismo)
+    def exibir_info(self):
+        super().exibir_info()
+        print(f"emissora: {self.emissora}")
+
+#subclasse Revista-adiciona o atributo edicao
+class Revista(Publicacao):
+    def __init__(self, titulo, autor, ano, edicao):
+        super().__init__(titulo, autor, ano)
+        self.edicao=edicao
+#polimorfismo (subscreve exibir_info)
+    def exibir_info(self):
+        super().exibir_info()
+        print(f"emissora: {self.edicao}")
+#classe biblioteca- Usa agregação guardando varias publicações
+class Biblioteca:
+    def __init__(self, nome: str):
+        self.nome = nome
+        self.publicacoes=[]  # lista que agrega objetos de diferente classes
+
+       #lista com livro,jornais e revistas
+        self.publicacoes.extend([
+            Livro("Don quixote","Miguel de Cervantes",1605,"292348"),
+            Livro("Orgulho e preconceito","Jane Austen",1813,"3829789"),
+            Livro("Senhor dos aneis","J.R.R Tolken",1954,"190191"),
+            Livro("1984","George Orwell",1949,"234932084"),
+            Jornal("Alagamento em recife","NE1",2025,"Globo"),
+            Jornal("queda de luz em são paulo","Fantastico",2020,"Globo"),
+            Jornal("Virada do seculo","Fantastico",1999,"Globo"),
+            Revista("Beyblade ","Capricho",2004,9),
+            Revista("Sempre o meu coração","Capricho",1965,160),
+            Revista("Rebelde?","Capricho",2013,200)
+
+
+
+        ])
+
+    #adiciona qualquer tipo de publicação
+    def adicionar_publicacao(self,pub):
+        self.publicacoes.append(pub)
+        print(f"\no livro:{pub.titulo} foi adicionado com sucesso a biblioteca\n")
+
+    #remove uma publicação pelo titulo
+    def remover_por_titulo(self,titulo:str):
+        for pub in self.publicacoes:
+            if pub.titulo == titulo:
+                self.publicacoes.remove(pub)
+                print(f"Removido:{titulo}")
+                return
+        print("Titulo não escontrado")
+    #listagem-Polimorfismo
+    def listar_publicacoes(self):
+        print("\n===Publicações===")
+        for pub in self.publicacoes:
+            print(pub.exibir_info())
+            print("==================")
+    #buscar por autor
+    def buscar_por_autor(self,autores):
+        print(f"buscando pelos livros de {autores}")
+        buscador =[pub for pub in self.publicacoes if pub.autor == autores]
+        for pub in buscador:
+            print("\n===Publicações===")
+            print(pub.exibir_info())
+            print("==================")
+        if not buscador:
+            print("autor inexistente")
+
+
+    #menu da biblioteca
+    def biblioteca_iniciar(self):
+        try:
+            terminou = 1
+            while terminou == 1:
+
+                a = int(input(
+                    "1-listar as publicações\n"
+                    "2-remover as publicações\n"
+                    "3-buscar por autor\n"
+                    "4-adicionar publicação\n"
+                    "5-sair\n"
+                ))
+
+                match a:
+                    case 1:
+
+                        self.listar_publicacoes()
+                    case 2:
+
+                        titulo = input("Digite o título a remover: ")
+                        self.remover_por_titulo(titulo)
+
+                    case 3:
+
+                        autores=input("digite o autor que deseja procurar:")
+                        self.buscar_por_autor(autores)
+                    case 4:
+
+                        titulo = str(input("Digite o título: "))
+                        autor = str(input("Digite o autor: "))
+
+                        try:
+                            ano = int(input("Digite o ano: "))
+                        except ValueError:
+
+                            print("\n❌ O ano tem que ser um número inteiro.\n")
+                            continue
+
+                        isbn=input("ISBN:")
+                        nova_publicacao=Livro(titulo,autor,ano,isbn)
+
+                        self.adicionar_publicacao(nova_publicacao)
+                    case 5:
+                        # sai do menu
+                        terminou = 0
+                        print("Saindo do menu...")
+        except ValueError:
+            # caso o input do menu não seja número
+            print("❌ Use um número válido.")
+alo=Biblioteca(nome="alo")
+alo.biblioteca_iniciar()
